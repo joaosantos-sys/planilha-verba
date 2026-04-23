@@ -359,6 +359,37 @@ body {
   padding-bottom: 2px;
 }
 
+.filter-separator {
+  width: 1px;
+  background: var(--border);
+  align-self: stretch;
+  margin: 0 4px;
+}
+
+.apply-group {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.apply-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.apply-field-label {
+  font-size: 10px;
+  color: #aaa;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+}
+
+.apply-input {
+  width: 100px !important;
+}
+
 /* ============================================================
    PAINEL DE ESTATÍSTICAS
    ============================================================ */
@@ -545,6 +576,11 @@ td.margem-atencao {
 td.margem-neutra {
   color: #aaa;
   font-style: italic;
+}
+
+/* Botão de replicar — abre espaço no input ao hover para não sobrepor o valor */
+tr:hover td.td-prvd1 .cell-input {
+  padding-right: 62px;
 }
 
 /* Botão de replicar PV D1 */

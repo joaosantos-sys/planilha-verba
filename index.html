@@ -87,6 +87,23 @@
     </div>
     <button class="btn btn-secondary btn-sm" id="btn-clear-filters">&#10005; Limpar filtros</button>
     <span class="filter-count" id="filter-count"></span>
+
+    <div class="filter-separator"></div>
+
+    <div class="filter-group">
+      <label class="filter-label">Aplicar às linhas filtradas</label>
+      <div class="apply-group">
+        <div class="apply-field">
+          <span class="apply-field-label">MAR. %</span>
+          <input type="text" class="filter-input apply-input" id="apply-mar" placeholder="ex: 5">
+        </div>
+        <div class="apply-field">
+          <span class="apply-field-label">PV D1 (R$)</span>
+          <input type="text" class="filter-input apply-input" id="apply-pvd1" placeholder="ex: 199.90">
+        </div>
+        <button class="btn btn-primary btn-sm" id="btn-apply-params" style="align-self:flex-end">&#10003; Aplicar</button>
+      </div>
+    </div>
   </div>
 
   <!-- Painel de estatísticas (aparece após carregar dados) -->

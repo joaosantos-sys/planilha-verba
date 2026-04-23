@@ -1029,6 +1029,32 @@ document.addEventListener('DOMContentLoaded', function () {
     renderTable();
   });
 
+  // Aplicar MAR% e/ou PV D1 às linhas filtradas
+  document.getElementById('btn-apply-params').addEventListener('click', function () {
+    const marStr  = document.getElementById('apply-mar').value.trim();
+    const pvd1Str = document.getElementById('apply-pvd1').value.trim();
+
+    if (!marStr && !pvd1Str) {
+      alert('Preencha ao menos MAR. % ou PV D1 para aplicar.');
+      return;
+    }
+
+    const indices = getFilteredIndices();
+    if (indices.length === 0) {
+      alert('Nenhuma linha filtrada para aplicar.');
+      return;
+    }
+
+    indices.forEach(idx => {
+      const row = tableData[idx];
+      if (marStr !== '')  row.MAR_PERC = parseInput(marStr,  'percent');
+      if (pvd1Str !== '') row.PRVD1    = parseInput(pvd1Str, 'currency');
+      calcularLinha(row);
+    });
+
+    renderTable();
+  });
+
   document.getElementById('btn-clear-filters').addEventListener('click', function () {
     filterState.search  = '';
     filterState.empresas = new Set();

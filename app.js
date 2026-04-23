@@ -69,7 +69,7 @@ const DEFAULT_PARAMS = {
 let tableData = [];
 
 // Estado dos filtros
-const filterState = { search: '', empresa: '', margem: '' };
+const filterState = { search: '', empresas: new Set(), margem: '' };
 
 function getFilteredIndices() {
   return tableData.reduce((acc, row, idx) => {
@@ -80,7 +80,7 @@ function getFilteredIndices() {
       );
       if (!hit) return acc;
     }
-    if (filterState.empresa !== '' && String(row.COD_EMPRESA) !== filterState.empresa) return acc;
+    if (filterState.empresas.size > 0 && !filterState.empresas.has(String(row.COD_EMPRESA))) return acc;
     if (filterState.margem) {
       const cls = classeMargem(row.MARGEM_ATUAL, num(row.MAR_PERC));
       const map = { positiva: 'margem-positiva', atencao: 'margem-atencao', negativa: 'margem-negativa' };
@@ -829,21 +829,55 @@ function exportarResultadosFCM(dtInicio, dtFim) {
    FILTROS — EMPRESA DROPDOWN
    ============================================================ */
 function popularFiltroEmpresa() {
-  const sel = document.getElementById('filter-empresa');
-  if (!sel) return;
-  const currentVal = sel.value;
+  const list = document.getElementById('empresa-check-list');
+  if (!list) return;
+
   const empresas = [...new Set(
     tableData.map(r => r.COD_EMPRESA).filter(v => v !== '' && v !== null && v !== undefined)
   )].sort((a, b) => Number(a) - Number(b));
 
-  sel.innerHTML = '<option value="">Todas</option>';
+  list.innerHTML = '';
   empresas.forEach(e => {
-    const opt = document.createElement('option');
-    opt.value = String(e);
-    opt.textContent = e;
-    sel.appendChild(opt);
+    const label = document.createElement('label');
+    label.className = 'multi-select-option';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.value = String(e);
+    cb.checked = filterState.empresas.size === 0 || filterState.empresas.has(String(e));
+    cb.addEventListener('change', onEmpresaCheckChange);
+    label.appendChild(cb);
+    label.appendChild(document.createTextNode(' ' + String(e)));
+    list.appendChild(label);
   });
-  sel.value = currentVal;
+
+  atualizarBotaoEmpresa();
+}
+
+function onEmpresaCheckChange() {
+  const checkboxes = [...document.querySelectorAll('#empresa-check-list input[type="checkbox"]')];
+  const checked    = checkboxes.filter(cb => cb.checked).map(cb => cb.value);
+  const todasCb    = document.getElementById('empresa-check-todas');
+
+  if (checked.length === checkboxes.length) {
+    todasCb.checked       = true;
+    todasCb.indeterminate = false;
+    filterState.empresas  = new Set();
+  } else {
+    todasCb.checked       = false;
+    todasCb.indeterminate = checked.length > 0;
+    filterState.empresas  = new Set(checked);
+  }
+
+  atualizarBotaoEmpresa();
+  renderTable();
+}
+
+function atualizarBotaoEmpresa() {
+  const btn = document.getElementById('filter-empresa-btn');
+  if (!btn) return;
+  btn.textContent = filterState.empresas.size === 0
+    ? 'Todas'
+    : [...filterState.empresas].join(', ');
 }
 
 /* ============================================================
@@ -940,8 +974,22 @@ document.addEventListener('DOMContentLoaded', function () {
     renderTable();
   });
 
-  document.getElementById('filter-empresa').addEventListener('change', function () {
-    filterState.empresa = this.value;
+  // Multi-select empresa
+  const empresaBtn   = document.getElementById('filter-empresa-btn');
+  const empresaPanel = document.getElementById('filter-empresa-panel');
+
+  empresaBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    empresaPanel.classList.toggle('open');
+  });
+  empresaPanel.addEventListener('click', (e) => e.stopPropagation());
+  document.addEventListener('click', () => empresaPanel.classList.remove('open'));
+
+  document.getElementById('empresa-check-todas').addEventListener('change', function () {
+    document.querySelectorAll('#empresa-check-list input').forEach(cb => { cb.checked = this.checked; });
+    this.indeterminate    = false;
+    filterState.empresas  = new Set();
+    atualizarBotaoEmpresa();
     renderTable();
   });
 
@@ -952,11 +1000,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
   document.getElementById('btn-clear-filters').addEventListener('click', function () {
     filterState.search  = '';
-    filterState.empresa = '';
+    filterState.empresas = new Set();
     filterState.margem  = '';
-    document.getElementById('filter-search').value  = '';
-    document.getElementById('filter-empresa').value = '';
-    document.getElementById('filter-margem').value  = '';
+    document.getElementById('filter-search').value = '';
+    document.getElementById('filter-margem').value = '';
+    const todasCb = document.getElementById('empresa-check-todas');
+    if (todasCb) {
+      todasCb.checked = true;
+      todasCb.indeterminate = false;
+      document.querySelectorAll('#empresa-check-list input').forEach(cb => { cb.checked = true; });
+    }
+    atualizarBotaoEmpresa();
     renderTable();
   });
 });

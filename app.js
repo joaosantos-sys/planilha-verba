@@ -1,6 +1,37 @@
 'use strict';
 
 /* ============================================================
+   AUTENTICAÇÃO
+   ============================================================ */
+const CREDENCIAIS = { login: 'planilhaverba', senha: 'verba123' };
+
+document.addEventListener('DOMContentLoaded', function () {
+  const overlay  = document.getElementById('login-overlay');
+  const form     = document.getElementById('login-form');
+  const errorEl  = document.getElementById('login-error');
+
+  if (sessionStorage.getItem('autenticado') === '1') {
+    overlay.style.display = 'none';
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const user = document.getElementById('login-user').value.trim();
+    const pass = document.getElementById('login-pass').value;
+
+    if (user === CREDENCIAIS.login && pass === CREDENCIAIS.senha) {
+      sessionStorage.setItem('autenticado', '1');
+      overlay.style.display = 'none';
+      errorEl.style.display = 'none';
+    } else {
+      errorEl.style.display = 'block';
+      document.getElementById('login-pass').value = '';
+      document.getElementById('login-pass').focus();
+    }
+  });
+});
+
+/* ============================================================
    DEFINIÇÃO DAS COLUNAS
    Cada objeto descreve uma coluna da planilha.
 

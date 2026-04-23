@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planilha Cálculo de Verba</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- SheetJS para importação de Excel -->
+  <script src="xlsx.full.min.js"></script>
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="header-content">
+      <h1 class="app-title">Planilha Cálculo de Verba</h1>
+      <span class="app-subtitle">Ferreira Costa</span>
+    </div>
+  </header>
+
+  <!-- Barra de ferramentas -->
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <button class="btn btn-primary" id="btn-import">&#128194; Importar Excel</button>
+      <input type="file" id="file-input" accept=".xlsx,.xls" hidden>
+      <button class="btn btn-secondary" id="btn-add-row">+ Linha</button>
+      <button class="btn btn-danger" id="btn-clear">&#128465; Limpar</button>
+      <button class="btn btn-modelo" id="btn-export-modelo">&#11015; Exportar Modelo</button>
+      <button class="btn btn-resultados" id="btn-export-resultados">&#128190; Exportar Resultados</button>
+    </div>
+    <div class="toolbar-right">
+      <div class="legend">
+        <span class="legend-dot positive"></span><span>Margem positiva</span>
+        <span class="legend-dot warning"></span><span>Abaixo da meta</span>
+        <span class="legend-dot negative"></span><span>Margem negativa</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra de filtros -->
+  <div class="filter-bar" id="filter-bar">
+    <div class="filter-group">
+      <label class="filter-label">Buscar</label>
+      <input type="text" class="filter-input" id="filter-search" placeholder="Fantasia, descrição, referência, código...">
+    </div>
+    <div class="filter-group">
+      <label class="filter-label">Empresa</label>
+      <select class="filter-select" id="filter-empresa">
+        <option value="">Todas</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label class="filter-label">Margem</label>
+      <select class="filter-select" id="filter-margem">
+        <option value="">Todas</option>
+        <option value="positiva">Positiva</option>
+        <option value="atencao">Atenção</option>
+        <option value="negativa">Negativa</option>
+      </select>
+    </div>
+    <button class="btn btn-secondary btn-sm" id="btn-clear-filters">&#10005; Limpar filtros</button>
+    <span class="filter-count" id="filter-count"></span>
+  </div>
+
+  <!-- Painel de estatísticas (aparece após carregar dados) -->
+  <div class="stats-panel" id="stats-panel" style="display:none">
+    <div class="stat-card">
+      <div class="stat-value" id="stat-total">0</div>
+      <div class="stat-label">Total de Linhas</div>
+    </div>
+    <div class="stat-card positive-card">
+      <div class="stat-value" id="stat-positive">0</div>
+      <div class="stat-label">Margem Positiva</div>
+    </div>
+    <div class="stat-card negative-card">
+      <div class="stat-value" id="stat-negative">0</div>
+      <div class="stat-label">Margem Negativa</div>
+    </div>
+    <div class="stat-card warning-card">
+      <div class="stat-value" id="stat-warning">0</div>
+      <div class="stat-label">Abaixo da Meta</div>
+    </div>
+  </div>
+
+  <!-- Tabela principal -->
+  <div class="table-container">
+    <table id="main-table" class="spreadsheet">
+      <thead id="table-head"></thead>
+      <tbody id="table-body"></tbody>
+    </table>
+    <div class="empty-state" id="empty-state">
+      <div class="empty-icon">&#128202;</div>
+      <p>Nenhum dado carregado.</p>
+      <p>Importe um arquivo Excel ou clique em <strong>+ Linha</strong> para inserir manualmente.</p>
+    </div>
+  </div>
+
+  <!-- Modal exportar resultados -->
+  <div class="modal-overlay" id="modal-export" style="display:none">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Exportar Resultados</h3>
+        <button class="modal-close" id="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-field">
+          <label class="modal-label">Tipo de Exportação</label>
+          <div class="toggle-group">
+            <label class="toggle-option">
+              <input type="radio" name="export-type" value="padrao" checked>
+              <span>Padrão</span>
+            </label>
+            <label class="toggle-option">
+              <input type="radio" name="export-type" value="fcm">
+              <span>FCM</span>
+            </label>
+          </div>
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">DT_INICIO</label>
+          <input type="date" class="modal-input" id="export-dt-inicio">
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">DT_FIM</label>
+          <input type="date" class="modal-input" id="export-dt-fim">
+        </div>
+        <p class="modal-info">Serão exportadas todas as linhas com verba calculada (colunas P e Q), duplicadas por canal de venda (Loja = 1 / Site = 2).</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="modal-cancel">Cancelar</button>
+        <button class="btn btn-primary" id="modal-confirm">&#128190; Exportar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

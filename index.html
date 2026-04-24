@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Planilha Cálculo de Verba</title>
   <link rel="stylesheet" href="style.css">
-  <!-- SheetJS para importação de Excel -->
   <script src="xlsx.full.min.js"></script>
 </head>
 <body>
@@ -14,6 +13,7 @@
   <div class="login-overlay" id="login-overlay">
     <div class="login-card">
       <div class="login-header">
+        <div class="login-logo">FC</div>
         <h1 class="login-title">Planilha Cálculo de Verba</h1>
         <span class="login-subtitle">Ferreira Costa</span>
       </div>
@@ -32,114 +32,164 @@
     </div>
   </div>
 
-  <header class="app-header">
-    <div class="header-content">
-      <h1 class="app-title">Planilha Cálculo de Verba</h1>
-      <span class="app-subtitle">Ferreira Costa</span>
-    </div>
-  </header>
+  <!-- Layout principal -->
+  <div class="app-layout">
 
-  <!-- Barra de ferramentas -->
-  <div class="toolbar">
-    <div class="toolbar-left">
-      <button class="btn btn-primary" id="btn-import">&#128194; Importar Excel</button>
-      <input type="file" id="file-input" accept=".xlsx,.xls" hidden>
-      <button class="btn btn-secondary" id="btn-add-row">+ Linha</button>
-      <button class="btn btn-danger" id="btn-clear">&#128465; Limpar</button>
-      <button class="btn btn-modelo" id="btn-export-modelo">&#11015; Exportar Modelo</button>
-      <button class="btn btn-resultados" id="btn-export-resultados">&#128190; Exportar Resultados</button>
-    </div>
-    <div class="toolbar-right">
-      <div class="legend">
-        <span class="legend-dot positive"></span><span>Margem positiva</span>
-        <span class="legend-dot warning"></span><span>Abaixo da meta</span>
-        <span class="legend-dot negative"></span><span>Margem negativa</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Barra de filtros -->
-  <div class="filter-bar" id="filter-bar">
-    <div class="filter-group">
-      <label class="filter-label">Buscar</label>
-      <input type="text" class="filter-input" id="filter-search" placeholder="Fantasia, descrição, referência, código...">
-    </div>
-    <div class="filter-group">
-      <label class="filter-label">Empresa</label>
-      <div class="multi-select" id="filter-empresa-wrapper">
-        <button type="button" class="multi-select-btn" id="filter-empresa-btn">Todas</button>
-        <div class="multi-select-panel" id="filter-empresa-panel">
-          <label class="multi-select-option multi-select-todas">
-            <input type="checkbox" id="empresa-check-todas" checked> Todas
-          </label>
-          <div id="empresa-check-list"></div>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">FC</div>
+        <div class="brand-info">
+          <span class="brand-name">Planilha Verba</span>
+          <span class="brand-sub">Ferreira Costa</span>
         </div>
       </div>
-    </div>
-    <div class="filter-group">
-      <label class="filter-label">Margem</label>
-      <select class="filter-select" id="filter-margem">
-        <option value="">Todas</option>
-        <option value="positiva">Positiva</option>
-        <option value="atencao">Atenção</option>
-        <option value="negativa">Negativa</option>
-      </select>
-    </div>
-    <button class="btn btn-secondary btn-sm" id="btn-clear-filters">&#10005; Limpar filtros</button>
-    <span class="filter-count" id="filter-count"></span>
 
-    <div class="filter-separator"></div>
-
-    <div class="filter-group">
-      <label class="filter-label">Aplicar às linhas filtradas</label>
-      <div class="apply-group">
-        <div class="apply-field">
-          <span class="apply-field-label">MAR. %</span>
-          <input type="text" class="filter-input apply-input" id="apply-mar" placeholder="ex: 5">
-        </div>
-        <div class="apply-field">
-          <span class="apply-field-label">PV D1 (R$)</span>
-          <input type="text" class="filter-input apply-input" id="apply-pvd1" placeholder="ex: 199.90">
-        </div>
-        <button class="btn btn-primary btn-sm" id="btn-apply-params" style="align-self:flex-end">&#10003; Aplicar</button>
+      <div class="sidebar-section">
+        <span class="sidebar-section-label">Dados</span>
+        <button class="sidebar-item" id="btn-import">
+          <span class="sidebar-item-icon">&#8593;</span>
+          <span>Importar Excel</span>
+        </button>
+        <input type="file" id="file-input" accept=".xlsx,.xls" hidden>
+        <button class="sidebar-item" id="btn-add-row">
+          <span class="sidebar-item-icon">+</span>
+          <span>Nova Linha</span>
+        </button>
+        <button class="sidebar-item sidebar-item-danger" id="btn-clear">
+          <span class="sidebar-item-icon">&#10005;</span>
+          <span>Limpar Dados</span>
+        </button>
       </div>
-    </div>
-  </div>
 
-  <!-- Painel de estatísticas (aparece após carregar dados) -->
-  <div class="stats-panel" id="stats-panel" style="display:none">
-    <div class="stat-card">
-      <div class="stat-value" id="stat-total">0</div>
-      <div class="stat-label">Total de Linhas</div>
-    </div>
-    <div class="stat-card positive-card">
-      <div class="stat-value" id="stat-positive">0</div>
-      <div class="stat-label">Margem Positiva</div>
-    </div>
-    <div class="stat-card negative-card">
-      <div class="stat-value" id="stat-negative">0</div>
-      <div class="stat-label">Margem Negativa</div>
-    </div>
-    <div class="stat-card warning-card">
-      <div class="stat-value" id="stat-warning">0</div>
-      <div class="stat-label">Abaixo da Meta</div>
-    </div>
-    <div class="stat-card verba-card">
-      <div class="stat-value stat-value-verba" id="stat-total-verba">R$ 0,00</div>
-      <div class="stat-label">Total Verba (Estoque × Verba Loja)</div>
-    </div>
-  </div>
+      <div class="sidebar-section">
+        <span class="sidebar-section-label">Exportar</span>
+        <button class="sidebar-item sidebar-item-accent" id="btn-export-resultados">
+          <span class="sidebar-item-icon">&#8595;</span>
+          <span>Exportar Resultados</span>
+        </button>
+        <button class="sidebar-item" id="btn-export-modelo">
+          <span class="sidebar-item-icon">&#8595;</span>
+          <span>Baixar Modelo</span>
+        </button>
+      </div>
 
-  <!-- Tabela principal -->
-  <div class="table-container">
-    <table id="main-table" class="spreadsheet">
-      <thead id="table-head"></thead>
-      <tbody id="table-body"></tbody>
-    </table>
-    <div class="empty-state" id="empty-state">
-      <div class="empty-icon">&#128202;</div>
-      <p>Nenhum dado carregado.</p>
-      <p>Importe um arquivo Excel ou clique em <strong>+ Linha</strong> para inserir manualmente.</p>
+      <div class="sidebar-section">
+        <span class="sidebar-section-label">Legenda</span>
+        <div class="sidebar-legend">
+          <div class="legend-row"><span class="badge badge-positive">Positiva</span><span>Margem &ge; meta</span></div>
+          <div class="legend-row"><span class="badge badge-warning">Aten&ccedil;&atilde;o</span><span>Abaixo da meta</span></div>
+          <div class="legend-row"><span class="badge badge-negative">Negativa</span><span>Margem &lt; 0</span></div>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="user-avatar">JS</div>
+          <span class="user-name">Jo&atilde;o Santos</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Conteúdo principal -->
+    <div class="main-content">
+
+      <!-- Topbar -->
+      <div class="topbar">
+        <div class="topbar-left">
+          <h1 class="page-title">C&aacute;lculo de Verba</h1>
+        </div>
+        <div class="topbar-center">
+          <div class="search-box">
+            <span class="search-icon">&#128269;</span>
+            <input type="text" class="search-input" id="filter-search" placeholder="Buscar por fantasia, descri&ccedil;&atilde;o, refer&ecirc;ncia, c&oacute;digo...">
+          </div>
+        </div>
+        <div class="topbar-right">
+          <span class="filter-count" id="filter-count"></span>
+        </div>
+      </div>
+
+      <!-- Barra de filtros -->
+      <div class="filter-bar" id="filter-bar">
+        <div class="filter-group">
+          <label class="filter-label">Empresa</label>
+          <div class="multi-select" id="filter-empresa-wrapper">
+            <button type="button" class="multi-select-btn" id="filter-empresa-btn">Todas</button>
+            <div class="multi-select-panel" id="filter-empresa-panel">
+              <label class="multi-select-option multi-select-todas">
+                <input type="checkbox" id="empresa-check-todas" checked> Todas
+              </label>
+              <div id="empresa-check-list"></div>
+            </div>
+          </div>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Margem</label>
+          <select class="filter-select" id="filter-margem">
+            <option value="">Todas</option>
+            <option value="positiva">Positiva</option>
+            <option value="atencao">Aten&ccedil;&atilde;o</option>
+            <option value="negativa">Negativa</option>
+          </select>
+        </div>
+        <button class="btn-filter-clear" id="btn-clear-filters">&#10005; Limpar filtros</button>
+
+        <div class="filter-separator"></div>
+
+        <div class="filter-group">
+          <label class="filter-label">Aplicar &agrave;s linhas filtradas</label>
+          <div class="apply-group">
+            <div class="apply-field">
+              <span class="apply-field-label">MAR. %</span>
+              <input type="text" class="filter-input apply-input" id="apply-mar" placeholder="ex: 5">
+            </div>
+            <div class="apply-field">
+              <span class="apply-field-label">PV D1 (R$)</span>
+              <input type="text" class="filter-input apply-input" id="apply-pvd1" placeholder="ex: 199.90">
+            </div>
+            <button class="btn btn-primary btn-sm" id="btn-apply-params" style="align-self:flex-end">&#10003; Aplicar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Painel de estatísticas -->
+      <div class="stats-panel" id="stats-panel" style="display:none">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-total">0</div>
+          <div class="stat-label">Total de Linhas</div>
+        </div>
+        <div class="stat-card positive-card">
+          <div class="stat-value" id="stat-positive">0</div>
+          <div class="stat-label">Margem Positiva</div>
+        </div>
+        <div class="stat-card negative-card">
+          <div class="stat-value" id="stat-negative">0</div>
+          <div class="stat-label">Margem Negativa</div>
+        </div>
+        <div class="stat-card warning-card">
+          <div class="stat-value" id="stat-warning">0</div>
+          <div class="stat-label">Abaixo da Meta</div>
+        </div>
+        <div class="stat-card verba-card">
+          <div class="stat-value stat-value-verba" id="stat-total-verba">R$ 0,00</div>
+          <div class="stat-label">Total Verba (Estoque &times; Verba Loja)</div>
+        </div>
+      </div>
+
+      <!-- Tabela principal -->
+      <div class="table-container">
+        <table id="main-table" class="spreadsheet">
+          <thead id="table-head"></thead>
+          <tbody id="table-body"></tbody>
+        </table>
+        <div class="empty-state" id="empty-state">
+          <div class="empty-icon">&#128202;</div>
+          <p>Nenhum dado carregado.</p>
+          <p>Importe um arquivo Excel ou clique em <strong>Nova Linha</strong> na barra lateral.</p>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -152,11 +202,11 @@
       </div>
       <div class="modal-body">
         <div class="modal-field">
-          <label class="modal-label">Tipo de Exportação</label>
+          <label class="modal-label">Tipo de Exporta&ccedil;&atilde;o</label>
           <div class="toggle-group">
             <label class="toggle-option">
               <input type="radio" name="export-type" value="padrao" checked>
-              <span>Padrão</span>
+              <span>Padr&atilde;o</span>
             </label>
             <label class="toggle-option">
               <input type="radio" name="export-type" value="fcm">
@@ -172,11 +222,11 @@
           <label class="modal-label">DT_FIM</label>
           <input type="date" class="modal-input" id="export-dt-fim">
         </div>
-        <p class="modal-info">Serão exportadas todas as linhas com verba calculada (colunas P e Q), duplicadas por canal de venda (Loja = 1 / Site = 2).</p>
+        <p class="modal-info">Ser&atilde;o exportadas as linhas <strong>filtradas</strong> com verba calculada (colunas Q e R), duplicadas por canal de venda (Loja = 1 / Site = 2).</p>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" id="modal-cancel">Cancelar</button>
-        <button class="btn btn-primary" id="modal-confirm">&#128190; Exportar</button>
+        <button class="btn btn-primary" id="modal-confirm">&#8595; Exportar</button>
       </div>
     </div>
   </div>

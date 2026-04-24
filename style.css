@@ -423,6 +423,10 @@ body {
 .warning-card { background: var(--color-warning-bg); border-color: var(--color-warning-bdr); }
 .warning-card .stat-value { color: var(--color-warning-dark); }
 
+.verba-card { background: #e8eaf6; border-color: #9fa8da; }
+.verba-card .stat-value { color: #3949ab; }
+.stat-value-verba { font-size: 17px; }
+
 /* ============================================================
    CONTAINER DA TABELA
    ============================================================ */

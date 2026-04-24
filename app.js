@@ -45,26 +45,28 @@ document.addEventListener('DOMContentLoaded', function () {
      width    - largura em px
    ============================================================ */
 const COLUMNS = [
-  // ── Inputs primários (A–G) ─────────────────────────────────
+  // ── Inputs primários (A–H) ─────────────────────────────────
   { id: 'A', key: 'CODIGO',       label: 'CÓDIGO',     type: 'integer', editable: true,  group: 'primary', width: 80  },
   { id: 'B', key: 'COD_FC',       label: 'COD FC',     type: 'integer', editable: true,  group: 'primary', width: 90  },
   { id: 'C', key: 'FANTAS',       label: 'FANTASIA',   type: 'text',    editable: true,  group: 'primary', width: 130 },
   { id: 'D', key: 'DESCRICAO',    label: 'DESCRIÇÃO',  type: 'text',    editable: true,  group: 'primary', width: 200 },
   { id: 'E', key: 'REFERENCIA',   label: 'REFERÊNCIA', type: 'text',    editable: true,  group: 'primary', width: 100 },
   { id: 'F', key: 'COD_EMPRESA',  label: 'EMPRESA',    type: 'integer', editable: true,  group: 'primary', width: 70  },
-  { id: 'G', key: 'CUE',          label: 'CUE (R$)',   type: 'currency',editable: true,  group: 'primary', width: 95  },
-  // ── Parâmetros (H–K) ──────────────────────────────────────
-  { id: 'H', key: 'OPER_PERC',    label: 'OPER. %',    type: 'percent', editable: true,  group: 'param',   width: 75  },
-  { id: 'I', key: 'ICMS_PERC',    label: 'ICMS %',     type: 'percent', editable: true,  group: 'param',   width: 75  },
-  { id: 'J', key: 'PC_PERC',      label: 'PC %',       type: 'percent', editable: true,  group: 'param',   width: 75  },
-  { id: 'K', key: 'MAR_PERC',     label: 'MAR. %',     type: 'percent', editable: true,  group: 'param',   width: 75  },
-  // ── Resultados calculados (L–O) ───────────────────────────
-  { id: 'L', key: 'VPC',          label: 'VPC (R$)',   type: 'currency',editable: true,  group: 'param',   width: 90  },
-  { id: 'M', key: 'PRECO',        label: 'PREÇO (R$)', type: 'currency',editable: false, group: 'result',  width: 100 },
-  { id: 'N', key: 'PRVD1',        label: 'PV D1 (R$)', type: 'currency',editable: true,  group: 'param',   width: 100 },
-  { id: 'O', key: 'MARGEM_ATUAL', label: 'MARGEM %',        type: 'percent', editable: false, group: 'result',  width: 110 },
-  { id: 'P', key: 'VERBA_LOJA',  label: 'VLR VERBA LOJA',  type: 'currency',editable: false, group: 'result',  width: 120 },
-  { id: 'Q', key: 'VERBA_SITE',  label: 'VLR VERBA SITE',  type: 'currency',editable: false, group: 'result',  width: 120 },
+  { id: 'G', key: 'ESTOQUE',      label: 'ESTOQUE',    type: 'integer', editable: true,  group: 'primary', width: 80  },
+  { id: 'H', key: 'CUE',          label: 'CUE (R$)',   type: 'currency',editable: true,  group: 'primary', width: 95  },
+  // ── Parâmetros (I–O) ──────────────────────────────────────
+  { id: 'I', key: 'OPER_PERC',    label: 'OPER. %',    type: 'percent', editable: true,  group: 'param',   width: 75  },
+  { id: 'J', key: 'ICMS_PERC',    label: 'ICMS %',     type: 'percent', editable: true,  group: 'param',   width: 75  },
+  { id: 'K', key: 'PC_PERC',      label: 'PC %',       type: 'percent', editable: true,  group: 'param',   width: 75  },
+  { id: 'L', key: 'MAR_PERC',     label: 'MAR. %',     type: 'percent', editable: true,  group: 'param',   width: 75  },
+  { id: 'M', key: 'VPC',          label: 'VPC (R$)',   type: 'currency',editable: true,  group: 'param',   width: 90  },
+  { id: 'N', key: 'PRECO',        label: 'PREÇO (R$)', type: 'currency',editable: false, group: 'result',  width: 100 },
+  { id: 'O', key: 'PRVD1',        label: 'PV D1 (R$)', type: 'currency',editable: true,  group: 'param',   width: 100 },
+  // ── Resultados calculados (P–S) ───────────────────────────
+  { id: 'P', key: 'MARGEM_ATUAL', label: 'MARGEM %',        type: 'percent', editable: false, group: 'result',  width: 110 },
+  { id: 'Q', key: 'VERBA_LOJA',  label: 'VLR VERBA LOJA',  type: 'currency',editable: false, group: 'result',  width: 120 },
+  { id: 'R', key: 'VERBA_SITE',  label: 'VLR VERBA SITE',  type: 'currency',editable: false, group: 'result',  width: 120 },
+  { id: 'S', key: 'TOTAL_VERBA', label: 'TOTAL VERBA LOJA',type: 'currency',editable: false, group: 'result',  width: 140 },
 ];
 
 /* Mapeamento de índice Excel → chave de dados para importação.
@@ -76,15 +78,16 @@ const EXCEL_IMPORT_MAP = {
   3:  'DESCRICAO',
   4:  'REFERENCIA',
   5:  'COD_EMPRESA',
-  6:  'CUE',
-  7:  'OPER_PERC',
-  8:  'ICMS_PERC',
-  9:  'PC_PERC',
-  10: 'MAR_PERC',
-  11: 'VPC',  // L = VPC → editável, importado do Excel
-  12: null,  // M = PRECO     → calculado
-  13: 'PRVD1',  // N = PRVD1 → editável, importado do Excel
-  14: null,  // O = MARGEM    → calculado
+  6:  'ESTOQUE',   // G = ESTOQUE → editável, importado do Excel
+  7:  'CUE',
+  8:  'OPER_PERC',
+  9:  'ICMS_PERC',
+  10: 'PC_PERC',
+  11: 'MAR_PERC',
+  12: 'VPC',       // M = VPC → editável, importado do Excel
+  13: null,        // N = PRECO     → calculado
+  14: 'PRVD1',     // O = PRVD1 → editável, importado do Excel
+  15: null,        // P = MARGEM    → calculado
 };
 
 // Valores padrão dos parâmetros (editáveis por linha)
@@ -222,10 +225,10 @@ function calcularVerbaLoja(row) {
 }
 
 /**
- * Q – VLR VERBA SITE
+ * R – VLR VERBA SITE
  *
  * Fórmula extraída da planilha:
- *   Q = G - N * (1 - 0.167 - I - J - K)
+ *   R = G - N * (1 - 0.167 - I - J - K)
  *
  * Igual à verba loja, mas usa taxa operacional fixa de 16,7% para o site
  * (em vez do OPER. % configurável da loja).
@@ -243,14 +246,30 @@ function calcularVerbaSite(row) {
 }
 
 /**
+ * S – TOTAL VERBA LOJA
+ *
+ * Fórmula: S = ESTOQUE × VLR VERBA LOJA
+ *
+ * Representa o total de verba necessário para o estoque em loja.
+ * Retorna null se não houver estoque ou verba.
+ */
+function calcularTotalVerba(row) {
+  const estoque = num(row.ESTOQUE);
+  const verba   = row.VERBA_LOJA;
+  if (!estoque || verba === null || verba === undefined) return null;
+  return estoque * verba;
+}
+
+/**
  * Recalcula todos os campos derivados de uma linha.
- * VPC (L) e PRVD1 (N) são editáveis — não recalculados aqui.
+ * VPC (M), PRVD1 (O) e ESTOQUE (G) são editáveis — não recalculados aqui.
  */
 function calcularLinha(row) {
   row.PRECO        = calcularPreco(row);
   row.MARGEM_ATUAL = calcularMargem(row);
   row.VERBA_LOJA   = calcularVerbaLoja(row);
   row.VERBA_SITE   = calcularVerbaSite(row);
+  row.TOTAL_VERBA  = calcularTotalVerba(row);
   return row;
 }
 
@@ -379,9 +398,9 @@ function renderHeader() {
 
   let groupRow = '<tr class="group-row">';
   groupRow += '<th class="group-action" rowspan="2"></th>'; // coluna #
-  groupRow += `<th class="group-primary" colspan="${primaryCols}">Inputs Primários (A–G)</th>`;
-  groupRow += `<th class="group-param"   colspan="${paramCols}">Parâmetros (H–K)</th>`;
-  groupRow += `<th class="group-result"  colspan="${resultCols}">Resultados (L–O)</th>`;
+  groupRow += `<th class="group-primary" colspan="${primaryCols}">Inputs Primários (A–H)</th>`;
+  groupRow += `<th class="group-param"   colspan="${paramCols}">Parâmetros (I–O)</th>`;
+  groupRow += `<th class="group-result"  colspan="${resultCols}">Resultados (P–S)</th>`;
   groupRow += '<th class="group-action" rowspan="2"></th>'; // botão excluir
   groupRow += '</tr>';
 
@@ -484,10 +503,10 @@ function buildResultCell(col, row) {
     return `<td class="result-cell col-result ${classe}" data-col="${col.key}">${texto}</td>`;
   }
 
-  // VERBA LOJA e VERBA SITE:
+  // VERBA LOJA, VERBA SITE e TOTAL VERBA:
   //   tem valor  → amarelo (verba necessária = atenção)
   //   nulo/vazio → verde   (sem necessidade de verba)
-  if (col.key === 'VERBA_LOJA' || col.key === 'VERBA_SITE') {
+  if (col.key === 'VERBA_LOJA' || col.key === 'VERBA_SITE' || col.key === 'TOTAL_VERBA') {
     const classe = val !== null ? 'margem-atencao' : 'margem-positiva';
     const texto  = val !== null ? fmtMoeda(val) : '';
     return `<td class="result-cell col-result ${classe}" data-col="${col.key}">${texto}</td>`;
@@ -507,7 +526,7 @@ function atualizarCelulasResultado(tr, row) {
       const classe = classeMargem(row[col.key], num(row.MAR_PERC));
       td.className   = `result-cell col-result ${classe}`;
       td.textContent = row[col.key] !== null ? fmtPercent(row[col.key]) : '-';
-    } else if (col.key === 'VERBA_LOJA' || col.key === 'VERBA_SITE') {
+    } else if (col.key === 'VERBA_LOJA' || col.key === 'VERBA_SITE' || col.key === 'TOTAL_VERBA') {
       const val    = row[col.key];
       td.className   = `result-cell col-result ${val !== null ? 'margem-atencao' : 'margem-positiva'}`;
       td.textContent = val !== null ? fmtMoeda(val) : '';
@@ -537,10 +556,13 @@ function atualizarEstatisticas(indices) {
     return r.MARGEM_ATUAL >= 0 && r.MARGEM_ATUAL < num(r.MAR_PERC);
   }).length;
 
-  document.getElementById('stat-total').textContent    = total;
-  document.getElementById('stat-positive').textContent = positiva;
-  document.getElementById('stat-negative').textContent = negativa;
-  document.getElementById('stat-warning').textContent  = atencao;
+  const totalVerba = visivel.reduce((sum, r) => sum + (r.TOTAL_VERBA !== null && r.TOTAL_VERBA !== undefined ? r.TOTAL_VERBA : 0), 0);
+
+  document.getElementById('stat-total').textContent      = total;
+  document.getElementById('stat-positive').textContent   = positiva;
+  document.getElementById('stat-negative').textContent   = negativa;
+  document.getElementById('stat-warning').textContent    = atencao;
+  document.getElementById('stat-total-verba').textContent = fmtMoeda(totalVerba);
 }
 
 /* ============================================================
@@ -758,9 +780,10 @@ function exportarResultados(dtInicio, dtFim) {
   ];
 
   const linhas = [cabecalho];
+  const dadosFiltrados = getFilteredIndices().map(i => tableData[i]);
 
-  // Canal 1 = Loja (coluna P = VERBA_LOJA)
-  tableData.forEach(row => {
+  // Canal 1 = Loja (coluna Q = VERBA_LOJA)
+  dadosFiltrados.forEach(row => {
     if (row.VERBA_LOJA === null || row.VERBA_LOJA === undefined) return;
     linhas.push([
       row.COD_EMPRESA,
@@ -777,8 +800,8 @@ function exportarResultados(dtInicio, dtFim) {
     ]);
   });
 
-  // Canal 2 = Site (coluna Q = VERBA_SITE)
-  tableData.forEach(row => {
+  // Canal 2 = Site (coluna R = VERBA_SITE)
+  dadosFiltrados.forEach(row => {
     if (row.VERBA_SITE === null || row.VERBA_SITE === undefined) return;
     linhas.push([
       row.COD_EMPRESA,
@@ -819,9 +842,10 @@ function exportarResultadosFCM(dtInicio, dtFim) {
   ];
 
   const linhas = [cabecalho];
+  const dadosFiltrados = getFilteredIndices().map(i => tableData[i]);
 
-  // Canal 1 = Loja (coluna P)
-  tableData.forEach(row => {
+  // Canal 1 = Loja (coluna Q)
+  dadosFiltrados.forEach(row => {
     if (row.VERBA_LOJA === null || row.VERBA_LOJA === undefined) return;
     linhas.push([
       row.FANTAS, 'P', dtInicio, dtFim, 'N',
@@ -831,8 +855,8 @@ function exportarResultadosFCM(dtInicio, dtFim) {
     ]);
   });
 
-  // Canal 2 = Site (coluna Q)
-  tableData.forEach(row => {
+  // Canal 2 = Site (coluna R)
+  dadosFiltrados.forEach(row => {
     if (row.VERBA_SITE === null || row.VERBA_SITE === undefined) return;
     linhas.push([
       row.FANTAS, 'P', dtInicio, dtFim, 'N',
@@ -917,7 +941,7 @@ function atualizarBotaoEmpresa() {
 function exportarModelo() {
   const cabecalho = [
     'CÓDIGO', 'COD FC', 'FANTASIA', 'DESCRIÇÃO', 'REFERÊNCIA',
-    'EMPRESA', 'CUE (R$)', 'OPER. %', 'ICMS %', 'PC %', 'MAR. %', 'VPC (R$)', 'PV D1 (R$)'
+    'EMPRESA', 'ESTOQUE', 'CUE (R$)', 'OPER. %', 'ICMS %', 'PC %', 'MAR. %', 'VPC (R$)', 'PV D1 (R$)'
   ];
   const empresas = [1, 2, 3, 4, 5, 6, 7, 8, 9, 92, 93];
 
@@ -933,7 +957,7 @@ function exportarModelo() {
   // Larguras de coluna
   ws['!cols'] = [
     { wch: 10 }, { wch: 10 }, { wch: 20 }, { wch: 30 }, { wch: 14 },
-    { wch: 10 }, { wch: 12 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 12 }, { wch: 12 }
+    { wch: 10 }, { wch: 10 }, { wch: 12 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 12 }, { wch: 12 }
   ];
 
   const wb = XLSX.utils.book_new();

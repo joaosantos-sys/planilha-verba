@@ -103,7 +103,7 @@ const DEFAULT_PARAMS = {
 let tableData = [];
 
 // Estado dos filtros
-const filterState = { search: '', empresas: new Set(), margem: '' };
+const filterState = { search: '', empresas: new Set(), margem: '', columns: {} };
 
 function getFilteredIndices() {
   return tableData.reduce((acc, row, idx) => {
@@ -119,6 +119,18 @@ function getFilteredIndices() {
       const cls = classeMargem(row.MARGEM_ATUAL, num(row.MAR_PERC));
       const map = { positiva: 'margem-positiva', atencao: 'margem-atencao', negativa: 'margem-negativa' };
       if (cls !== map[filterState.margem]) return acc;
+    }
+    for (const [key, fv] of Object.entries(filterState.columns)) {
+      if (!fv) continue;
+      const col = COLUMNS.find(c => c.key === key);
+      let cellStr;
+      if (col && col.type === 'percent') {
+        const n = parseFloat(row[key]);
+        cellStr = isNaN(n) ? '' : String(parseFloat((n * 100).toFixed(6)));
+      } else {
+        cellStr = String(row[key] ?? '').toLowerCase();
+      }
+      if (!cellStr.includes(fv.toLowerCase().replace(',', '.'))) return acc;
     }
     acc.push(idx);
     return acc;
@@ -415,7 +427,23 @@ function renderHeader() {
   });
   colRow += '</tr>';
 
-  thead.innerHTML = groupRow + colRow;
+  // ── Linha 3: filtros por coluna (A–L) ─────────────────────
+  let filterRow = '<tr class="filter-row">';
+  filterRow += '<th class="col-filter-empty"></th>';
+  COLUMNS.forEach((col, idx) => {
+    const w = col.width;
+    if (idx < 12) {
+      filterRow += `<th class="col-filter col-${col.group}" style="width:${w}px;min-width:${w}px">
+        <input class="col-filter-input" data-col="${col.key}" placeholder="&#128269;" type="text" autocomplete="off">
+      </th>`;
+    } else {
+      filterRow += `<th class="col-filter-empty col-${col.group}" style="width:${w}px;min-width:${w}px"></th>`;
+    }
+  });
+  filterRow += '<th class="col-filter-empty"></th>';
+  filterRow += '</tr>';
+
+  thead.innerHTML = groupRow + colRow + filterRow;
 }
 
 /** Renderiza todo o corpo da tabela */
@@ -465,7 +493,7 @@ function buildRow(row, originalIdx, displayNum) {
       const isText      = col.type === 'text';
       const placeholder = col.type === 'percent' ? '0' : '-';
       const title       = col.type === 'percent' ? `${col.label} (ex: 21.5 para 21,5%)` : col.label;
-      const hasReplicate = col.key === 'PRVD1' || col.key === 'MAR_PERC';
+      const hasReplicate = col.key === 'PRVD1' || col.key === 'MAR_PERC' || col.key === 'ICMS_PERC';
 
       html += `<td class="col-${col.group}${hasReplicate ? ' td-prvd1' : ''}">
         <input
@@ -586,7 +614,7 @@ function vincularEventos() {
       const rowIdx = parseInt(btn.dataset.row, 10);
       const colKey = btn.dataset.col;
       const valor  = tableData[rowIdx][colKey];
-      tableData.forEach(row => { row[colKey] = valor; calcularLinha(row); });
+      getFilteredIndices().forEach(idx => { tableData[idx][colKey] = valor; calcularLinha(tableData[idx]); });
       renderTable();
     });
   });
@@ -972,6 +1000,19 @@ document.addEventListener('DOMContentLoaded', function () {
   renderHeader();
   renderTable();
 
+  // Filtros por coluna (A–L)
+  document.querySelectorAll('.col-filter-input').forEach(input => {
+    input.addEventListener('input', function () {
+      const val = this.value.trim();
+      if (val) {
+        filterState.columns[this.dataset.col] = val;
+      } else {
+        delete filterState.columns[this.dataset.col];
+      }
+      renderTable();
+    });
+  });
+
   // Botão "Importar Excel"
   document.getElementById('btn-import').addEventListener('click', () => {
     document.getElementById('file-input').click();
@@ -1079,10 +1120,56 @@ document.addEventListener('DOMContentLoaded', function () {
     renderTable();
   });
 
+  // Copiar consulta SQL
+  const SQL_CONSULTA = `SELECT
+    P.CODIGO,
+    P.CODIGO || P.DIGITO || 0 AS COD_FC,
+    P.FANTAS,
+    P.DESCRICAO,
+    P.REFERENCIA,
+    B.COD_EMPRESA,
+    B.CUE,
+    NVL(E.QTDE_TOTAL, 0) AS ESTOQUE
+FROM PROD P
+JOIN PRODB B
+    ON B.CODIGO = P.CODIGO
+LEFT JOIN (
+    SELECT
+        CODIGO,
+        COD_EMPRESA,
+        SUM(QTDE) AS QTDE_TOTAL
+    FROM PROD_ESTOQUE
+    GROUP BY CODIGO, COD_EMPRESA
+) E
+    ON E.CODIGO = P.CODIGO
+    AND E.COD_EMPRESA = B.COD_EMPRESA
+WHERE P.FANTAS LIKE 'NOME FORNECEDOR%'
+  AND P.REFERENCIA = 'MODELO'
+  AND B.CUE > 0
+  AND P.ID_FAMILIA IS NULL`;
+
+  document.getElementById('btn-copy-sql').addEventListener('click', function () {
+    navigator.clipboard.writeText(SQL_CONSULTA).then(() => {
+      const btn  = this;
+      const span = btn.querySelector('span:last-child');
+      const orig = span.textContent;
+      span.textContent = 'Copiado!';
+      btn.style.color  = '#6ee7b7';
+      setTimeout(() => {
+        span.textContent = orig;
+        btn.style.color  = '';
+      }, 2000);
+    }).catch(() => {
+      alert('Não foi possível copiar. Copie manualmente:\n\n' + SQL_CONSULTA);
+    });
+  });
+
   document.getElementById('btn-clear-filters').addEventListener('click', function () {
     filterState.search  = '';
     filterState.empresas = new Set();
     filterState.margem  = '';
+    filterState.columns = {};
+    document.querySelectorAll('.col-filter-input').forEach(inp => { inp.value = ''; });
     document.getElementById('filter-search').value = '';
     document.getElementById('filter-margem').value = '';
     const todasCb = document.getElementById('empresa-check-todas');

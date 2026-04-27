@@ -197,7 +197,7 @@ body {
 }
 
 .brand-name { display: block; font-size: 13px; font-weight: 700; color: #f9fafb; }
-.brand-sub  { display: block; font-size: 11px; color: #4b5563; margin-top: 1px; }
+.brand-sub  { display: block; font-size: 11px; color: #9ca3af; margin-top: 1px; }
 
 .sidebar-section { padding: 14px 10px 4px; }
 
@@ -207,7 +207,7 @@ body {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .8px;
-  color: #374151;
+  color: #9ca3af;
   padding: 0 6px;
   margin-bottom: 4px;
 }
@@ -657,6 +657,34 @@ th.col-action  { background: #111827; width: 36px; }
 
 th .col-letter { display: block; font-size: 9px; opacity: .45; margin-bottom: 1px; }
 th .col-name   { display: block; font-size: 11px; }
+
+/* Linha de filtros por coluna (A–L) */
+.spreadsheet thead tr.filter-row th {
+  padding: 3px 4px;
+  border: 1px solid rgba(255,255,255,.05);
+}
+tr.filter-row th.col-primary   { background: #193557; }
+tr.filter-row th.col-param     { background: #3b4251; }
+tr.filter-row th.col-filter-empty { background: #111827; }
+
+.col-filter-input {
+  width: 100%;
+  height: 20px;
+  padding: 0 5px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 3px;
+  color: #d1d5db;
+  font-size: 10px;
+  font-family: var(--font);
+  outline: none;
+  transition: background .12s, border-color .15s;
+}
+.col-filter-input::placeholder { color: rgba(255,255,255,.18); font-size: 11px; }
+.col-filter-input:focus {
+  background: rgba(255,255,255,.13);
+  border-color: rgba(147,197,253,.55);
+}
 
 /* Corpo */
 .spreadsheet tbody tr { background: var(--card-bg); }

@@ -1097,8 +1097,8 @@ document.addEventListener('DOMContentLoaded', function () {
     P.DESCRICAO,
     P.REFERENCIA,
     B.COD_EMPRESA,
-    B.CUE,
-    NVL(E.QTDE_TOTAL, 0) AS ESTOQUE
+    NVL(E.QTDE_TOTAL, 0) AS ESTOQUE,
+    B.CUE
 FROM PROD P
 JOIN PRODB B
     ON B.CODIGO = P.CODIGO

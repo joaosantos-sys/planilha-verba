@@ -833,9 +833,9 @@ function exportarResultados(dtInicio, dtFim) {
 
 function exportarResultadosFCM(dtInicio, dtFim) {
   const cabecalho = [
-    'FORNECEDOR_FANTAS', 'TIPO', 'DT_INICIO', 'DT_FIM', 'SELL_OUT_S_N',
-    'COD_PRODUTO', 'COD_FILIAL', 'DESCONTO_CUE', 'QTDE',
-    'LOJA', 'ECOMMERCE', 'VENDA_CORPORATIVA', 'CANAL_VENDA'
+    'Fornecedor (Fantas)', 'Tipo (P ou F)', 'Data Inicial', 'Data Final', 'Sell-Out (S ou N)',
+    'Cód. Produto', 'Cód. Filial', 'Desconto CUE', 'Quantidade',
+    'Loja (S ou N)', 'E-Commerce (S ou N)', 'Venda Corporativa (S ou N)', 'Anotações'
   ];
 
   const linhas = [cabecalho];

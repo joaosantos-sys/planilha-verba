@@ -846,7 +846,7 @@ function exportarResultadosFCM(dtInicio, dtFim) {
     if (row.VERBA_LOJA === null || row.VERBA_LOJA === undefined) return;
     linhas.push([
       row.FANTAS, 'P', dtInicio, dtFim, 'N',
-      row.CODIGO, row.COD_EMPRESA,
+      row.COD_FC, row.COD_EMPRESA,
       parseFloat(row.VERBA_LOJA.toFixed(2)),
       10, 'S', 'N', 'N', 1
     ]);
@@ -857,7 +857,7 @@ function exportarResultadosFCM(dtInicio, dtFim) {
     if (row.VERBA_SITE === null || row.VERBA_SITE === undefined) return;
     linhas.push([
       row.FANTAS, 'P', dtInicio, dtFim, 'N',
-      row.CODIGO, row.COD_EMPRESA,
+      row.COD_FC, row.COD_EMPRESA,
       parseFloat(row.VERBA_SITE.toFixed(2)),
       10, 'N', 'S', 'N', 2
     ]);

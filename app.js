@@ -1123,7 +1123,7 @@ WHERE P.FANTAS LIKE 'NOME FORNECEDOR%'
       const span = btn.querySelector('span:last-child');
       const orig = span.textContent;
       span.textContent = 'Copiado!';
-      btn.style.color  = '#6ee7b7';
+      btn.style.color  = '#7AC143';
       setTimeout(() => {
         span.textContent = orig;
         btn.style.color  = '';
